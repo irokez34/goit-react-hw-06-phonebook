@@ -3,19 +3,26 @@ import FormInput from './Form-input/form-input';
 import ContactList from './Contact-list/contact-list';
 import Filter from './Filter/filter';
 
-import '../store/store';
 import NotificationMessage from './notification-message/NotificationMessage';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  addContact,
+  filterContacts,
+  removeContact,
+} from 'store/ContactsToolKit/createSliceContactList';
 
 export const App = () => {
-  const { phoneBook, filter } = useSelector(state => state);
+  const {
+    contacts: { phoneBook, filter },
+  } = useSelector(state => state);
+
   const dispatch = useDispatch();
 
   const handleAddContact = data => {
     const isContact = phoneBook.find(el => el.number === data.number);
 
     if (isContact) return alert('Контакт Існує');
-    dispatch({ type: 'addContact', payload: data });
+    dispatch(addContact(data));
   };
 
   useEffect(() => {
@@ -23,10 +30,10 @@ export const App = () => {
   }, [phoneBook]);
 
   const deleteContact = id => {
-    dispatch({ type: 'deleteContact', payload: id });
+    dispatch(removeContact(id));
   };
   const filterContact = ({ target: { value } }) =>
-    dispatch({ type: 'filterContacts', payload: value });
+    dispatch(filterContacts(value));
   const filteredContacts = phoneBook.filter(contact =>
     contact.name.toLowerCase().includes(filter.toLowerCase())
   );

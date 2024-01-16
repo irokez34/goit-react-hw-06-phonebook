@@ -1,33 +1,19 @@
-import { createStore } from 'redux';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import { phoneBookReducer } from './ContactsToolKit/createSliceContactList';
+// import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import persistReducer from 'redux-persist/es/persistReducer';
+import persistStore from 'redux-persist/es/persistStore';
 
-const reducer = (state, action) => {
-  if (action.type === 'setContacts')
-    return {
-      ...state,
-      phoneBook: action.payload,
-    };
-  if (action.type === 'addContact') {
-    return {
-      ...state,
-      phoneBook: [...state.phoneBook, action.payload],
-    };
-  }
-  if (action.type === 'deleteContact') {
-    return {
-      ...state,
-      phoneBook: state.phoneBook.filter(el => el.id !== action.payload),
-    };
-  }
-  if (action.type === 'filterContacts') {
-    return {
-      ...state,
-      filter: action.payload,
-    };
-  }
-  return state;
-};
-
-export const store = createStore(reducer, {
-  phoneBook: JSON.parse(localStorage.getItem('contactsList')) ?? [],
-  filter: '',
+const reducer = combineReducers({
+  contacts: phoneBookReducer,
 });
+
+const persistConfig = {
+  key: 'contactsList',
+  storage,
+};
+const persistedReducer = persistReducer(persistConfig, reducer);
+
+export const store = configureStore({ reducer: persistedReducer });
+export const persistor = persistStore(store);
